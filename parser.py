@@ -9,7 +9,8 @@ parser.add_argument('--image_file_suffix', dest='image_file_suffix', type=str, h
 args = parser.parse_args()
 
 object_map = {1: "Car", 2: "Truck", 23: "Ship", 4: "Tractor", \
-5: "Camping Car", 9: "Van", 10: "Vehicle", 11: "Pick-Up", 31: "Plane"}
+5: "Camping Car", 9: "Van", 10: "Vehicle", 11: "Pick-Up", 31: "Plane", \
+7: "other", 8: "Other"}
 
 class Image:
     def __init__(self, image_name, image_suffix, object_map, image_size):
@@ -27,6 +28,7 @@ class Image:
         str(self.image_size) + "</height><depth>3</depth></size><segmented>0</segmented>"
         for object_label in self.object_labels:
             output_string = output_string + object_label.create_xml_text()
+        output_string = output_string + "</annotation>"
         save_name = os.path.join(output_directory, "{}.xml".format(self.image_name))
         text_file = open(save_name, "w")
         _ = text_file.write(output_string)
@@ -49,7 +51,7 @@ class Object_label:
     def create_xml_text(self):
         return "<object><name>" + str(self.object_name) + "</name><pose>Unspecified</pose><truncated>0</truncated><difficult>0</difficult>" +\
         "<bndbox><xmin>" + str(self.xmin)  + "</xmin><ymin>" + str(self.ymin) + "</ymin><xmax>" + str(self.xmax) + "</xmax><ymax>" + str(self.ymax) +\
-        "</ymax></bndbox></object></annotation>"
+        "</ymax></bndbox></object>"
 
 # run through the items in the VEDAI label file
 image_cache = None
@@ -68,4 +70,3 @@ for row in open(args.label_directory, "r"):
                                 image_size=512)
     image_cache.add_object_label(row)
     image_cache.save_xml(args.output_location)
-    
